@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>兒童遊戲樂園</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+  .container {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 550px;
+    width: 100%;
+    text-align: center;
+    margin: 20px auto;
+  }
+  h1 { font-size: 2.2em; color: #764ba2; margin-bottom: 8px; }
+  .subtitle { color: #666; margin-bottom: 28px; font-size: 1.05em; }
+  .game-list { display: flex; flex-direction: column; gap: 16px; }
+  .game-card {
+    display: flex;
+    align-items: center;
+    background: #f8f8ff;
+    border-radius: 16px;
+    padding: 18px 24px;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent;
+  }
+  .game-card:hover { transform: scale(1.03); box-shadow: 0 8px 24px rgba(102,126,234,0.25); border-color: #667eea; }
+  .game-icon { font-size: 2.8em; margin-right: 20px; }
+  .game-info { text-align: left; }
+  .game-info h2 { font-size: 1.2em; color: #764ba2; margin-bottom: 2px; }
+  .game-info span { font-size: 0.9em; color: #888; }
+
+  .footer { margin-top: 28px; font-size: 0.85em; color: #aaa; }
+
+  @media (max-width: 480px) {
+    .container { padding: 20px; }
+    h1 { font-size: 1.6em; }
+    .game-card { padding: 14px 16px; }
+    .game-icon { font-size: 2em; margin-right: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎮 兒童遊戲樂園</h1>
+  <p class="subtitle">選擇一個遊戲來玩吧！</p>
+
+  <div class="game-list">
+    <a class="game-card" href="memory.html">
+      <div class="game-icon">🧠</div>
+      <div class="game-info">
+        <h2>記憶配對</h2>
+        <span>翻開卡片，找出所有相同的圖案配對</span>
+      </div>
+    </a>
+    <a class="game-card" href="mole.html">
+      <div class="game-icon">🔨</div>
+      <div class="game-info">
+        <h2>打地鼠</h2>
+        <span>在時間內點擊地鼠，打得越多分數越高</span>
+      </div>
+    </a>
+    <a class="game-card" href="catch.html">
+      <div class="game-icon">🧺</div>
+      <div class="game-info">
+        <h2>接水果</h2>
+        <span>用方向鍵移動籃子，接住掉下來的水果</span>
+      </div>
+    </a>
+    <a class="game-card" href="feedback.html" style="border-color:#e0e0f0; background:#fff8f8;">
+      <div class="game-icon">💬</div>
+      <div class="game-info">
+        <h2>心得留言板</h2>
+        <span>寫下你玩遊戲的心得和分數</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="footer">Made for kids 🎈</div>
+</div>
+
+<script>
+  // No script needed for index
+</script>
+</body>
+</html>

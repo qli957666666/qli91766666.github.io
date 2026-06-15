@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>記憶配對 | 兒童遊戲</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .container {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+  }
+  h1 { font-size: 1.8em; color: #764ba2; margin-bottom: 4px; }
+  .back { display: block; text-align: left; margin-bottom: 8px; }
+  .back a { color: #667eea; text-decoration: none; font-size: 0.9em; }
+  .back a:hover { text-decoration: underline; }
+  .score-board {
+    display: flex; justify-content: space-between;
+    margin-bottom: 14px; font-size: 1.05em; color: #555;
+  }
+  .score-board span { font-weight: bold; color: #667eea; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .card {
+    aspect-ratio: 1;
+    background: linear-gradient(145deg, #667eea, #764ba2);
+    border-radius: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2em;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    user-select: none;
+  }
+  .card:hover { transform: scale(1.05); }
+  .card.flipped { background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .card.matched { background: #c8e6c9; cursor: default; transform: scale(0.95); opacity: 0.7; }
+  .btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white; border: none; padding: 10px 32px;
+    border-radius: 50px; font-size: 1em; cursor: pointer;
+    font-weight: bold; transition: transform 0.2s;
+    margin-top: 14px;
+  }
+  .btn:hover { transform: scale(1.05); }
+  .help-btn {
+    display: inline-block; width: 28px; height: 28px;
+    line-height: 28px; border-radius: 50%; background: #ddd;
+    color: #555; font-weight: bold; cursor: pointer;
+    font-size: 0.85em; margin-left: 8px; vertical-align: middle;
+  }
+  .help-btn:hover { background: #ccc; }
+  .help-box {
+    background: #f8f8ff; border-radius: 12px; padding: 14px 18px;
+    margin: 10px 0 0; text-align: left; font-size: 0.95em;
+    color: #444; line-height: 1.7; display: none; border: 1px solid #e0e0f0;
+  }
+  .help-box.show { display: block; }
+  .help-box li { margin-left: 18px; }
+  .message { margin-top: 10px; font-size: 1.2em; min-height: 1.8em; font-weight: bold; }
+
+  @media (max-width: 480px) {
+    .container { padding: 14px; }
+    h1 { font-size: 1.4em; }
+    .card { font-size: 1.6em; }
+    .grid { gap: 6px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="back"><a href="index.html">← 回遊戲列表</a></div>
+  <h1>🧠 記憶配對</h1>
+  <div class="score-board">
+    <div>配對: <span id="pairs">0</span> / 8</div>
+    <div>步數: <span id="moves">0</span></div>
+  </div>
+  <div class="grid" id="grid"></div>
+  <button class="btn" onclick="initGame()">重新開始</button>
+  <span class="help-btn" onclick="toggleHelp()">?</span>
+  <div class="help-box" id="helpBox">
+    <strong>🎯 目標：</strong>找出所有相同的配對卡片。<br>
+    <strong>🕹️ 玩法：</strong>
+    <ul>
+      <li>點擊卡片翻開，記住圖案位置</li>
+      <li>一次翻兩張，圖案相同即配對成功</li>
+      <li>全部配對完成就過關！</li>
+    </ul>
+    <strong>💡 提示：</strong>仔細記住每張卡片的位置，步數越少越厲害！
+  </div>
+  <div class="message" id="message"></div>
+</div>
+<script>
+  const emojis = ['🐶','🐱','🐼','🦊','🐸','🐵','🐰','🦄'];
+  let openedCards, matchedPairs, moves, lockBoard;
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function initGame() {
+    const deck = shuffle([...emojis, ...emojis]);
+    document.getElementById('grid').innerHTML = deck.map((e, i) =>
+      `<div class="card" data-index="${i}" data-emoji="${e}" onclick="flipCard(this)">?</div>`
+    ).join('');
+    openedCards = []; matchedPairs = 0; moves = 0; lockBoard = false;
+    document.getElementById('pairs').textContent = '0';
+    document.getElementById('moves').textContent = '0';
+    document.getElementById('message').textContent = '';
+  }
+
+  function flipCard(el) {
+    if (lockBoard || el.classList.contains('flipped') || el.classList.contains('matched')) return;
+    el.textContent = el.dataset.emoji;
+    el.classList.add('flipped');
+    openedCards.push(el);
+    if (openedCards.length === 2) {
+      moves++;
+      document.getElementById('moves').textContent = moves;
+      const [a, b] = openedCards;
+      if (a.dataset.emoji === b.dataset.emoji) {
+        a.classList.add('matched'); b.classList.add('matched');
+        matchedPairs++;
+        document.getElementById('pairs').textContent = matchedPairs;
+        openedCards = [];
+        if (matchedPairs === emojis.length) document.getElementById('message').textContent = '🎉 你贏了！太棒了！';
+      } else {
+        lockBoard = true;
+        setTimeout(() => {
+          a.textContent = '?'; b.textContent = '?';
+          a.classList.remove('flipped'); b.classList.remove('flipped');
+          openedCards = []; lockBoard = false;
+        }, 700);
+      }
+    }
+  }
+
+  function toggleHelp() {
+    document.getElementById('helpBox').classList.toggle('show');
+  }
+
+  initGame();
+</script>
+</body>
+</html>

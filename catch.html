@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>接水果 | 兒童遊戲</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .container {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+  }
+  h1 { font-size: 1.8em; color: #764ba2; margin-bottom: 4px; }
+  .back { display: block; text-align: left; margin-bottom: 8px; }
+  .back a { color: #667eea; text-decoration: none; font-size: 0.9em; }
+  .back a:hover { text-decoration: underline; }
+  .info {
+    display: flex; justify-content: center; gap: 30px;
+    margin-bottom: 10px; font-size: 1.05em; color: #555;
+  }
+  .info span { font-weight: bold; color: #667eea; }
+  .area {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 400px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #87CEEB 0%, #90EE90 70%, #228B22 100%);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .basket {
+    position: absolute;
+    bottom: 8px;
+    width: 70px;
+    height: 40px;
+    font-size: 2.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: left 0.08s;
+    user-select: none;
+    pointer-events: none;
+  }
+  .fruit {
+    position: absolute;
+    font-size: 1.8em;
+    user-select: none;
+    pointer-events: none;
+  }
+  .btn {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white; border: none; padding: 10px 32px;
+    border-radius: 50px; font-size: 1em; cursor: pointer;
+    font-weight: bold; transition: transform 0.2s;
+    margin-top: 10px;
+  }
+  .btn:hover { transform: scale(1.05); }
+  .help-btn {
+    display: inline-block; width: 28px; height: 28px;
+    line-height: 28px; border-radius: 50%; background: #ddd;
+    color: #555; font-weight: bold; cursor: pointer;
+    font-size: 0.85em; margin-left: 8px; vertical-align: middle;
+  }
+  .help-btn:hover { background: #ccc; }
+  .help-box {
+    background: #f8f8ff; border-radius: 12px; padding: 14px 18px;
+    margin: 10px 0 0; text-align: left; font-size: 0.95em;
+    color: #444; line-height: 1.7; display: none; border: 1px solid #e0e0f0;
+  }
+  .help-box.show { display: block; }
+  .help-box li { margin-left: 18px; }
+  .controls { margin-top: 8px; font-size: 0.95em; color: #888; }
+  .message { margin-top: 10px; font-size: 1.2em; min-height: 1.8em; font-weight: bold; }
+
+  @media (max-width: 480px) {
+    .container { padding: 14px; }
+    h1 { font-size: 1.4em; }
+    .area { height: 320px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="back"><a href="index.html">← 回遊戲列表</a></div>
+  <h1>🧺 接水果</h1>
+  <div class="info">
+    <div>得分: <span id="score">0</span></div>
+    <div>生命: <span id="lives">3</span></div>
+  </div>
+  <div class="area" id="area">
+    <div class="basket" id="basket">🧺</div>
+  </div>
+  <button class="btn" onclick="initGame()">開始遊戲</button>
+  <span class="help-btn" onclick="toggleHelp()">?</span>
+  <div class="help-box" id="helpBox">
+    <strong>🎯 目標：</strong>用籃子接住掉下來的水果，不要讓水果落地！<br>
+    <strong>🕹️ 玩法：</strong>
+    <ul>
+      <li>按鍵盤 <strong>←</strong> <strong>→</strong> 方向鍵移動籃子</li>
+      <li>接住水果得 1 分</li>
+      <li>沒接住水果會失去 1 條生命（共 3 條）</li>
+      <li>生命歸零遊戲結束</li>
+    </ul>
+    <strong>💡 提示：</strong>手機版目前需使用鍵盤，建議在電腦上遊玩！
+  </div>
+  <div class="controls">← → 方向鍵移動籃子</div>
+  <div class="message" id="message"></div>
+</div>
+<script>
+  let running, score, lives, fruits, animId, spawnTimer, basketX, area, basketEl;
+  const fruitsList = ['🍎','🍊','🍋','🍇','🍓','🍑','🍒','🥝'];
+
+  function initGame() {
+    running = false; score = 0; lives = 3; fruits = [];
+    document.getElementById('score').textContent = '0';
+    document.getElementById('lives').textContent = '3';
+    document.getElementById('message').textContent = '';
+    area = document.getElementById('area');
+    basketEl = document.getElementById('basket');
+    basketX = (area.clientWidth || 400) / 2 - 35;
+    basketEl.style.left = basketX + 'px';
+    document.querySelectorAll('.fruit').forEach(f => f.remove());
+    clearInterval(spawnTimer);
+    if (animId) cancelAnimationFrame(animId);
+    running = true;
+    spawnTimer = setInterval(spawnFruit, 900);
+    requestAnimationFrame(update);
+  }
+
+  function spawnFruit() {
+    if (!running || lives <= 0) return;
+    const w = area.clientWidth || 400;
+    const f = document.createElement('div');
+    f.className = 'fruit';
+    f.textContent = fruitsList[Math.floor(Math.random() * fruitsList.length)];
+    f.style.left = (Math.random() * (w - 36)) + 'px';
+    f.style.top = '-30px';
+    f.dataset.y = '-30';
+    f.dataset.speed = (1.5 + Math.random() * 2).toFixed(2);
+    area.appendChild(f);
+    fruits.push(f);
+  }
+
+  function update() {
+    if (!running) return;
+    const h = area.clientHeight || 400;
+    const w = area.clientWidth || 400;
+    const r = { left: basketX, right: basketX + 70, top: h - 48, bottom: h - 8 };
+
+    for (let i = fruits.length - 1; i >= 0; i--) {
+      const f = fruits[i];
+      let y = parseFloat(f.dataset.y) + parseFloat(f.dataset.speed);
+      f.dataset.y = y;
+      f.style.top = y + 'px';
+
+      if (y + 30 >= r.top && y + 30 <= r.bottom) {
+        const fx = parseFloat(f.style.left);
+        if (fx + 30 > r.left && fx < r.right) {
+          score++;
+          document.getElementById('score').textContent = score;
+          f.remove(); fruits.splice(i,1);
+          continue;
+        }
+      }
+
+      if (y > h) {
+        lives--;
+        document.getElementById('lives').textContent = lives;
+        f.remove(); fruits.splice(i,1);
+        if (lives <= 0) {
+          document.getElementById('message').textContent = '💔 遊戲結束！得分: ' + score;
+          running = false;
+          clearInterval(spawnTimer);
+          cancelAnimationFrame(animId);
+          return;
+        }
+      }
+    }
+    animId = requestAnimationFrame(update);
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+    e.preventDefault();
+    if (!running) return;
+    const w = area ? area.clientWidth : 400;
+    if (e.key === 'ArrowLeft') basketX = Math.max(0, basketX - 18);
+    if (e.key === 'ArrowRight') basketX = Math.min(w - 70, basketX + 18);
+    basketEl.style.left = basketX + 'px';
+  });
+
+  function toggleHelp() {
+    document.getElementById('helpBox').classList.toggle('show');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的資料夾 | 兒童遊戲</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .container {
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    max-width: 640px;
+    width: 100%;
+  }
+  .back { display: block; margin-bottom: 12px; }
+  .back a { color: #667eea; text-decoration: none; font-size: 0.9em; }
+  .back a:hover { text-decoration: underline; }
+
+  .folder-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 20px;
+    border-bottom: 3px solid #e0e0f0;
+    padding-bottom: 0;
+  }
+  .folder-tab {
+    padding: 10px 22px;
+    border-radius: 12px 12px 0 0;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #888;
+    background: transparent;
+    border: none;
+    transition: all 0.2s;
+  }
+  .folder-tab:hover { color: #667eea; background: #f0f0ff; }
+  .folder-tab.active {
+    color: white;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+  }
+  .folder-content { display: none; }
+  .folder-content.active { display: block; }
+
+  /* 心得 paper */
+  .paper {
+    background: #fffef5;
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+    border: 1px solid #f0e8d0;
+    position: relative;
+  }
+  .paper::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50px;
+    width: 2px; height: 100%;
+    background: #ffd7d7; opacity: 0.4;
+  }
+  .paper .header-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    border-bottom: 2px solid #764ba2; padding-bottom: 10px; margin-bottom: 20px;
+    flex-wrap: wrap; gap: 8px;
+  }
+  .paper .student-name { font-size: 1.3em; font-weight: bold; color: #764ba2; }
+  .paper .student-id { font-size: 0.95em; color: #999; }
+  .paper .content {
+    font-size: 1.1em; line-height: 2; color: #333;
+    text-indent: 2em; white-space: pre-wrap; word-break: break-word;
+  }
+  .paper .footer-text {
+    text-align: right; margin-top: 24px; font-size: 1em;
+    color: #764ba2; font-weight: bold; padding-top: 12px;
+    border-top: 1px dashed #e0e0f0;
+  }
+
+  /* 遊戲說明 */
+  .instructions { padding: 4px 0; }
+  .game-block {
+    background: #f8f8ff;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    border: 1px solid #e0e0f0;
+  }
+  .game-block:last-child { margin-bottom: 0; }
+  .game-block h2 { font-size: 1.15em; color: #764ba2; margin-bottom: 6px; }
+  .game-block .file { font-size: 0.85em; color: #aaa; margin-bottom: 8px; }
+  .game-block .desc { font-size: 0.95em; color: #444; line-height: 1.7; }
+  .game-block ul { margin: 4px 0 0 18px; }
+  .game-block li { margin-bottom: 2px; }
+
+  @media (max-width: 480px) {
+    .container { padding: 16px; }
+    .paper { padding: 20px; }
+    .paper::before { left: 30px; }
+    .paper .content { font-size: 1em; }
+    .folder-tab { padding: 8px 14px; font-size: 0.9em; }
+    .game-block { padding: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="back"><a href="index.html">← 回遊戲列表</a></div>
+  <h1 style="font-size:1.6em;color:#764ba2;text-align:center;margin-bottom:4px">📁 我的資料夾</h1>
+
+  <div class="folder-tabs">
+    <button class="folder-tab active" onclick="switchTab(0,this)">📖 我的心得</button>
+    <button class="folder-tab" onclick="switchTab(1,this)">📋 遊戲說明</button>
+  </div>
+
+  <!-- 頁籤 1：心得 -->
+  <div class="folder-content active" id="tab0">
+    <div class="paper">
+      <div class="header-row">
+        <span class="student-name">李靜樺</span>
+        <span class="student-id">81410323</span>
+      </div>
+      <div class="content">
+我覺得老師的課程很棒，只是希望老師可以把課程的內容放在易課上，當我聽不懂的時候，或是當天無法到校上課時，我可以到易課上看老師當天的上課內容，上傳我的功課，出席分數沒拿到，至少可以拿到作業分數。
+
+謝謝老師這學期的用心教導 ❤️
+      </div>
+      <div class="footer-text">— 學生 李靜樺 敬上</div>
+    </div>
+  </div>
+
+  <!-- 頁籤 2：遊戲說明 -->
+  <div class="folder-content" id="tab1">
+    <div class="instructions">
+      <div class="game-block">
+        <h2>🧠 記憶配對</h2>
+        <div class="file">檔案：memory.html</div>
+        <div class="desc">
+          <strong>🎯 目標：</strong>找出所有相同的配對卡片，總共 8 對。<br>
+          <strong>🕹️ 玩法：</strong>
+          <ul>
+            <li>點擊卡片翻開，記住圖案位置</li>
+            <li>一次翻兩張，圖案相同即配對成功</li>
+            <li>全部配對完成就過關！</li>
+          </ul>
+          <strong>💡 提示：</strong>步數越少越厲害！
+        </div>
+      </div>
+
+      <div class="game-block">
+        <h2>🔨 打地鼠</h2>
+        <div class="file">檔案：mole.html</div>
+        <div class="desc">
+          <strong>🎯 目標：</strong>在 30 秒內打到越多地鼠越好。<br>
+          <strong>🕹️ 玩法：</strong>
+          <ul>
+            <li>點擊「開始遊戲」後，地鼠會隨機從洞裡冒出</li>
+            <li>看到地鼠就趕快點牠，打中得 1 分</li>
+            <li>30 秒倒數結束時遊戲停止</li>
+          </ul>
+          <strong>💡 提示：</strong>地鼠出現要趕快打，慢了會縮回去喔！
+        </div>
+      </div>
+
+      <div class="game-block">
+        <h2>🧺 接水果</h2>
+        <div class="file">檔案：catch.html</div>
+        <div class="desc">
+          <strong>🎯 目標：</strong>用籃子接住掉下來的水果，不要讓水果落地。<br>
+          <strong>🕹️ 玩法：</strong>
+          <ul>
+            <li>按鍵盤 <strong>←</strong> <strong>→</strong> 方向鍵移動籃子</li>
+            <li>接住水果得 1 分</li>
+            <li>沒接住水果會失去 1 條生命（共 3 條）</li>
+            <li>生命歸零遊戲結束</li>
+          </ul>
+          <strong>💡 提示：</strong>建議在電腦上使用鍵盤遊玩！
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(idx, el) {
+    document.querySelectorAll('.folder-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.folder-content').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('tab' + idx).classList.add('active');
+  }
+</script>
+</body>
+</html>
